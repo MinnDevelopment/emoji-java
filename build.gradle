@@ -3,12 +3,23 @@ plugins {
     id('java-library')
     id('maven-publish')
     id('com.github.johnrengelman.shadow').version('7.1.0')
+    id('de.undercouch.download').version('4.1.2')
 }
 
 group = 'com.github.minndevelopment'
 version = '6.0.0'
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+tasks.create("downloadJson", Download) {
+    group = "build setup"
+    dest file("src/main/resources/emoji-definitions.json")
+    src "https://emzi0767.gl-pages.emzi0767.dev/discord-emoji/discordEmojiMap.json"
+}
+
+processResources {
+    dependsOn downloadJson
+}
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'

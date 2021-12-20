@@ -24,25 +24,50 @@ public class EmojiManager {
     static {
         try (InputStream stream = EmojiLoader.class.getResourceAsStream(PATH)) {
             List<Emoji> emojis = EmojiLoader.loadEmojis(stream);
+            Map<String, Emoji> definitions = EmojiLoader.loadEmojiBundle();
+
             ALL_EMOJIS = emojis;
-            for (Emoji emoji : emojis) {
-                Set<Emoji> set = EMOJIS_BY_CATEGORY.computeIfAbsent(emoji.getCategory(), k -> new HashSet<>());
-                set.add(emoji);
-
-                for (String tag : emoji.getTags()) {
-                    set = EMOJIS_BY_TAG.computeIfAbsent(tag.toLowerCase(Locale.ROOT), k -> new HashSet<>());
-                    set.add(emoji);
+            for (ListIterator<Emoji> iter = emojis.listIterator(); iter.hasNext();) {
+                Emoji emoji = iter.next();
+                Emoji definition = definitions.remove(emoji.getUnicode());
+                // Update the aliases with the additional information
+                if (definition != null) {
+                    Set<String> joint = new HashSet<>(emoji.aliases);
+                    joint.addAll(definition.aliases);
+                    iter.set(
+                        emoji = emoji.setAliases(new ArrayList<>(joint))
+                                     .setFitzpatrick(definition.supportsFitzpatrick || emoji.supportsFitzpatrick)
+                    );
                 }
 
-                for (String alias : emoji.getAliases()) {
-                    EMOJIS_BY_ALIAS.put(alias.toLowerCase(Locale.ROOT), emoji);
-                }
+                loadEmoji(emoji);
+            }
+
+            // Add all the missing emojis defined in the definitions list
+            for (Map.Entry<String, Emoji> entry : definitions.entrySet()) {
+                Emoji emoji = entry.getValue();
+                loadEmoji(emoji);
+                emojis.add(emoji);
             }
 
             EMOJI_TRIE = new EmojiTrie(emojis);
             ALL_EMOJIS.sort((e1, e2) -> e2.getUnicode().length() - e1.getUnicode().length());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void loadEmoji(Emoji emoji) {
+        Set<Emoji> set = EMOJIS_BY_CATEGORY.computeIfAbsent(emoji.getCategory(), k -> new HashSet<>());
+        set.add(emoji);
+
+        for (String tag : emoji.getTags()) {
+            set = EMOJIS_BY_TAG.computeIfAbsent(tag.toLowerCase(Locale.ROOT), k -> new HashSet<>());
+            set.add(emoji);
+        }
+
+        for (String alias : emoji.getAliases()) {
+            EMOJIS_BY_ALIAS.put(alias.toLowerCase(Locale.ROOT), emoji);
         }
     }
 

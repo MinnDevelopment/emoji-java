@@ -222,5 +222,5 @@ You can search a string of mixed emoji/non-emoji characters and have all of the 
 
 **emoji-java** originally used the data provided by the [github/gemoji project](https://github.com/github/gemoji). It is still based on it but has evolved since.
 
-The emoji list has been taken from [kcthota/emoji4j](https://github.com/kcthota/emoji4j).
+The emoji lists have been taken from [kcthota/emoji4j](https://github.com/kcthota/emoji4j) and [Emzi0767/discord-emoji](https://gitlab.emzi0767.dev/Emzi0767/discord-emoji).
 

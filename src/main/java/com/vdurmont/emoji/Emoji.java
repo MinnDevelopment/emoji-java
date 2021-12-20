@@ -17,16 +17,16 @@ import java.util.Locale;
  * @author Vincent DURMONT [vdurmont@gmail.com]
  */
 public class Emoji {
-    private final String description;
-    private final boolean supportsFitzpatrick;
-    private final boolean hasVariation;
-    private final List<String> aliases;
-    private final List<String> tags;
-    private final EmojiCategory category;
-    private final String unicode;
-    private final String trimmedUnicode;
-    private final String htmlDec;
-    private final String htmlHex;
+    protected final String description;
+    protected final boolean supportsFitzpatrick;
+    protected final boolean hasVariation;
+    protected final List<String> aliases;
+    protected final List<String> tags;
+    protected final EmojiCategory category;
+    protected final String unicode;
+    protected final String trimmedUnicode;
+    protected final String htmlDec;
+    protected final String htmlHex;
 
     /**
      * Constructor for the Emoji.
@@ -76,6 +76,30 @@ public class Emoji {
         this.htmlHex = String.join("", Arrays.copyOf(pointCodesHex, count));
         this.hasVariation = unicode.contains("\uFE0F");
         this.trimmedUnicode = hasVariation ? unicode.replace("\uFE0F", "") : unicode;
+    }
+
+    protected Emoji setDescription(String description) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, unicode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected Emoji setFitzpatrick(boolean supportsFitzpatrick) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, unicode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected Emoji setCategory(EmojiCategory category) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, unicode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected Emoji setAliases(List<String> aliases) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, unicode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected Emoji setTags(List<String> tags) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, unicode.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected Emoji setBytes(byte... bytes) {
+        return new Emoji(description, supportsFitzpatrick, category, aliases, tags, bytes);
     }
 
     /**

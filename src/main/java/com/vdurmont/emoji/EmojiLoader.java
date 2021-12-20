@@ -10,8 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Loads the emojis from a JSON database.
@@ -53,6 +52,46 @@ public class EmojiLoader {
             }
         }
         return emojis;
+    }
+
+    public static Map<String, Emoji> loadEmojiBundle() throws IOException {
+        try (Reader reader = new InputStreamReader(EmojiLoader.class.getResourceAsStream("/emoji-definitions.json"), StandardCharsets.UTF_8)) {
+            JSONObject file = new JSONObject(new JSONTokener(reader));
+            JSONArray definitions = file.getJSONArray("emojiDefinitions");
+            Map<String, Emoji> map = new HashMap<>(definitions.length()+1);
+            for (int i = 0; i < definitions.length(); i++) {
+                JSONObject json = definitions.getJSONObject(i);
+                if (!json.has("category")) continue; // TODO: Wait for upstream fix
+
+                String key = json.getString("surrogates");
+                String primaryName = json.getString("primaryName");
+                boolean supportsFitzpatrick = primaryName.contains("_tone");
+                if (supportsFitzpatrick) {
+                    key = key.substring(0, key.length() - 2);
+                    if (map.containsKey(key)) {
+                        map.put(key, map.get(key).setFitzpatrick(true));
+                        continue;
+                    }
+                }
+
+                byte[] bytes = key.getBytes(StandardCharsets.UTF_8);
+                List<String> aliases = jsonArrayToStringList(json.getJSONArray("names"));
+                List<String> tags = Collections.emptyList();
+                EmojiCategory category = convertCategory(json.getString("category"));
+                Emoji emoji = new Emoji("", supportsFitzpatrick, category, aliases, tags, bytes);
+                map.put(key, emoji);
+            }
+            return map;
+        }
+    }
+
+    private static EmojiCategory convertCategory(String raw) {
+        for (EmojiCategory category : EmojiCategory.values()) {
+            if (category.name().equalsIgnoreCase(raw))
+                return category;
+        }
+        System.out.println("Unknown category " + raw);
+        return EmojiCategory.UNKNOWN;
     }
 
     protected static Emoji buildEmojiFromJSON(JSONObject json) {
