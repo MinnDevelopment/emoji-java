@@ -54,6 +54,15 @@ public class EmojiLoader {
         return emojis;
     }
 
+    /**
+     * Loads the emoji-definitions from the resources.
+     *
+     * @throws IOException
+     *         If there is an I/O error when trying to read the resource file
+     *
+     * @return {@link Map} of emoji characters to emoji instances
+     */
+    @NotNull
     public static Map<String, Emoji> loadEmojiBundle() throws IOException {
         try (Reader reader = new InputStreamReader(EmojiLoader.class.getResourceAsStream("/emoji-definitions.json"), StandardCharsets.UTF_8)) {
             JSONObject file = new JSONObject(new JSONTokener(reader));
@@ -90,7 +99,6 @@ public class EmojiLoader {
             if (category.name().equalsIgnoreCase(raw))
                 return category;
         }
-        System.out.println("Unknown category " + raw);
         return EmojiCategory.UNKNOWN;
     }
 

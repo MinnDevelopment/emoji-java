@@ -11,14 +11,24 @@ version = '6.0.0'
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-tasks.create("downloadJson", Download) {
+tasks.create("downloadDefinitions", Download) {
     group = "build setup"
     dest file("src/main/resources/emoji-definitions.json")
     src "https://emzi0767.gl-pages.emzi0767.dev/discord-emoji/discordEmojiMap.json"
 }
 
+tasks.create("downloadEmojiList", Download) {
+    group = "build setup"
+    dest file("src/main/resources/emoji-list.json")
+    src "https://raw.githubusercontent.com/kcthota/emoji4j/master/src/main/resources/emoji.json"
+}
+
+tasks.create("downloadResources") {
+    dependsOn(downloadDefinitions, downloadEmojiList)
+}
+
 processResources {
-    dependsOn downloadJson
+    dependsOn downloadResources
 }
 
 tasks.withType(JavaCompile) {
