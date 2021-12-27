@@ -70,7 +70,7 @@ public class EmojiLoader {
             Map<String, Emoji> map = new HashMap<>(definitions.length()+1);
             for (int i = 0; i < definitions.length(); i++) {
                 JSONObject json = definitions.getJSONObject(i);
-                if (!json.has("category")) continue; // TODO: Wait for upstream fix
+                if (!json.has("category")) continue;
 
                 String key = json.getString("surrogates");
                 String primaryName = json.getString("primaryName");
